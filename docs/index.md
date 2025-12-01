@@ -5,5 +5,5 @@
 
 ## List of tables and functions
 
-### [`Game` global table](table/Game)
+### [`Game` global table](Game)
 The `Game` table is the main table for PB95 to store data in. It's exported by PBML to global namespace, so you can use it in your code
