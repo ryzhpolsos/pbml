@@ -36,7 +36,7 @@ Adds a new entry to the Progressbar OS list and allows user to boot it.
 
 |Name|Type|Description|Example|
 |---|---|---|---|
-|`osTableEntry`|[`_OSTableEntry`](../types/_OSTableEntry)|Information about new OS|[`_OSTableEntry`](../types/_OSTableEntry)|
+|`osTableEntry`|[`_OSTableEntry`](../types/OSTableEntry)|Information about new OS|[`_OSTableEntry`](../types/OSTableEntry)|
 |`index`|`number`|If presented, new OS will be added into this position in list|`8`|
 
 #### Return value
