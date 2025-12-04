@@ -1,9 +1,9 @@
-# Progressbar95 API Documentation
-
-> [!NOTE]
-> This documentation is **unofficial** and is created using decompiled game code. The API may change in any update!
+# PBML API Documentation
 
 ## List of tables and functions
 
-### [`Game` global table](Game)
-The `Game` table is the main table for PB95 to store data in. It's exported by PBML to global namespace, so you can use it in your code
+### [`pbml` table](pbml)
+`pbml` table provides utility functions for mod developers.
+
+### [`Game` table](Game)
+The `Game` table is the main PB95 table.
