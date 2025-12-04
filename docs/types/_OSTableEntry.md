@@ -2,6 +2,7 @@
 Represents a Progressbar OS.
 
 ## Properties
+
 |Name|Type|Description|Example|
 |---|---|---|---|
 |`AllowDownloadMusic`|`bool`|Sets whether user can download music|`true`|
