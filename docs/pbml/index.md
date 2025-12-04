@@ -7,6 +7,7 @@
 Sets the specified value when it becomes available.
 
 #### Arguments
+
 |Name|Type|Description|Example|
 |---|---|---|---|
 |`value`|`string`|String representation of value path, starting with a global table name|`"Game.OS_Table.PXP.FontStyle.Comic"`|
@@ -20,6 +21,7 @@ Sets the specified value when it becomes available.
 Executes `callback` every frame.
 
 #### Arguments
+
 |Name|Type|Description|Example|
 |---|---|---|---|
 |`callback`|`function`|Function that will be called every frame|`function() print("every frame") end`|
@@ -31,6 +33,7 @@ Executes `callback` every frame.
 Adds a new entry to the Progressbar OS list and allows user to boot it.
 
 #### Arguments
+
 |Name|Type|Description|Example|
 |---|---|---|---|
 |`osTableEntry`|[`_OSTableEntry`](../types/_OSTableEntry)|Information about new OS|[`_OSTableEntry`](../types/_OSTableEntry)|
