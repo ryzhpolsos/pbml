@@ -29,7 +29,7 @@ A tiny, modular modloader for Progressbar95 intended to easily create mods witho
 ## Mod creation
 1. Create a subdirectory inside of `[game dir]/Resources/mods`
 2. Put a file called `main.lua` inside of it
-3. Refer to [engine api](https://docs.coronalabs.com/api/index.html) and [pbml documentation](https://ryzhpolsos.github.io/pbml/docs)
+3. Refer to [engine api](https://docs.coronalabs.com/api/index.html) and [pbml documentation](https://ryzhpolsos.github.io/pbml)
 
 ## License
 [The MIT License](https://github.com/ryzhpolsos/pbml/blob/main/LICENSE)
