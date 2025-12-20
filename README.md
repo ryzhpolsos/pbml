@@ -24,7 +24,8 @@ A tiny, modular modloader for Progressbar95 intended to easily create mods witho
 
 ## Mod installation
 1. Download mod
-2. Extract it to `[game dir]/Resources/mods` directory
+2. Open Mod Manager (Ctrl+M) in game
+3. Click on "Install mod" and select mod file
 
 ## Mod creation
 1. Create a subdirectory inside of `[game dir]/Resources/mods`
