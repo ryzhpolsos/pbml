@@ -1,9 +1,19 @@
-# PBML API Documentation
+# PBML Documentation
 
-## List of tables and functions
+## API Reference
 
-### [`pbml` table](pbml)
+### [`pbml` table](api/pbml)
 `pbml` table provides utility functions for mod developers.
 
-### [`Game` table](Game)
+### [`Game` table](api/Game)
 The `Game` table is the main PB95 table.
+
+## Guides
+
+[How to create mods for PBML](guides/createMod)
+[How to add custom OS](guides/addOS)
+[How to create patches](guides/patch)
+
+## Other
+
+[PBML command line syntax](cmdline)
