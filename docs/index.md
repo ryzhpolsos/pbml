@@ -11,7 +11,9 @@ The `Game` table is the main PB95 table.
 ## Guides
 
 [How to create mods for PBML](guides/createMod)
+
 [How to add custom OS](guides/addOS)
+
 [How to create patches](guides/patch)
 
 ## Other
