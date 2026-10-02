@@ -1,3 +1,15 @@
+function inject(path)
+    if system.getInfo("platform") == "android" then
+        local file = io.open(system.pathForFile(path))
+        local script = file:read("*a")
+        file:close()
+
+        return loadstring(script)()
+    else
+        return dofile(pbml.resourcesDirectory .. '/' .. path)
+    end    
+end
+
 local lfs = require('lfs')
 local json = require('json')
 
@@ -17,7 +29,34 @@ pbml = {
     patcherPath = '__PBML_PATCHER_PATH__'
 }
 
-local util = dofile(pbml.resourcesDirectory .. '/pbml/util.lua')
+local util = inject('pbml/util.lua')
+
+if not util.isFileExists(pbml.dataDirectory) then
+    local success, err = lfs.mkdir(pbml.dataDirectory)
+
+    if not success then
+        native.showAlert('PBML', err, { 'OK' }, function() os.exit(1) end)
+        return
+    end
+end
+
+if not util.isFileExists(pbml.dataDirectory .. '/pbml') then
+    local success, err = lfs.mkdir(pbml.dataDirectory .. '/pbml')
+
+    if not success then 
+        native.showAlert('PBML', err, { 'OK' }, function() os.exit(1) end)
+        return
+    end
+end
+
+if not util.isFileExists(pbml.dataDirectory .. '/mods') then
+    local success, err = lfs.mkdir(pbml.dataDirectory .. '/mods')
+
+    if not success then 
+        native.showAlert('PBML', err, { 'OK' }, function() os.exit(1) end)
+        return
+    end
+end
 
 for modFolder in lfs.dir(pbml.dataDirectory .. '/mods') do
     if modFolder ~= '.' and modFolder ~= '..' and util.isFileExists(pbml.dataDirectory .. '/mods/' .. modFolder .. '/mod.json') then

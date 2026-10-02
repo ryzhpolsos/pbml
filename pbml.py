@@ -6,6 +6,7 @@ import shutil
 import subprocess
 from urllib.request import urlopen
 from typing import List, Dict, Any
+import xml.etree.ElementTree as ET
 
 VERSION = 0.4
 
@@ -14,6 +15,12 @@ CORONA_ARCHIVER_FILE_NAME = 'corona-archiver.py'
 
 UNLUAC_URL = 'https://deac-fra.dl.sourceforge.net/project/unluac/Unstable/unluac_2025_10_19.jar'
 UNLUAC_FILE_NAME = 'unluac.jar'
+
+APKTOOL_URL = 'https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_3.0.3.jar'
+APKTOOL_FILE_NAME = 'apktool.jar'
+
+APKSIGNER_URL = 'https://github.com/patrickfav/uber-apk-signer/releases/download/v1.3.0/uber-apk-signer-1.3.0.jar'
+APKSIGNER_FILE_NAME = 'uber-apk-signer.jar'
 
 def run_cmd(*args):
     subprocess.Popen(args).wait()
@@ -120,6 +127,7 @@ logs = []
 def main():
     # parse command line arguments
     no_logo: bool = False
+    android: bool = False
     silent: bool = False
     force: bool = False
     debug: bool = False
@@ -145,7 +153,8 @@ def main():
                 debug = True
             case '--android' | '-a':
                 resources_dir = 'assets'
-                data_dir = '/storage/emulated/0/pbml'
+                data_dir = '/storage/emulated/0/progressbar95'
+                android = True
             case '--force' | '-f':
                 force = True
             case '--patch' | '-p':
@@ -165,8 +174,8 @@ def main():
     pbml_patches = [
         {
             'functionName': 'main/f0',
-            'addRegisters': 2,
-            'addConstants': ['"Game"', '"dofile"', f'"{game_dir.replace("\\", "/")}/{resources_dir}/pbml/init.lua"', f'"{game_dir.replace("\\", "/")}/{resources_dir}/pbml/main.lua"'],
+            'addRegisters': 4,
+            'addConstants': ['"Game"', '"system"', '"pathForFile"', '"io"', '"open"', '"read"', '"loadstring"', '"pbml/init.lua"', '"pbml/main.lua"', '"*a"', '"MEDIC GAMING: "'],
             'actions': [
                 {
                     'match': r'\.constant\s+(k\d+)\s+"BeginMenu"',
@@ -175,11 +184,24 @@ def main():
                     }
                 },
                 {
-                    'match': r'getglobal\s+r0\s+k0',
+                    'match': r'getglobal\s+r0\s+k0',''
                     'code': [
-                        'getglobal $r0 $k1',
-                        'loadk $r1 $k2',
-                        'call $r0 2 1'
+                        'getglobal $r0 $k6',
+                        'getglobal $r1 $k3',
+                        'loadk $r2 $k4',
+                        'gettable $r1 $r1 $r2',
+                        'getglobal $r2 $k1',
+                        'loadk $r3 $k2',
+                        'gettable $r2 $r2 $r3',      
+                        'loadk $r3 $k7',
+                        'call $r2 2 2',
+                        'call $r1 2 2',
+                        'loadk $r3 $k5',
+                        'self $r1 $r1 $r3',
+                        'loadk $r3 $k9',
+                        'call $r1 3 2',
+                        'call $r0 2 2',
+                        'call $r0 1 1'
                     ],
                     'insertBefore': True
                 },
@@ -188,9 +210,22 @@ def main():
                     'match': r'loadk\s+r\d+\s+${constNumber}',
                     'code': [
                         'setglobal r1 $k0',
-                        'getglobal $r0 $k1',
-                        'loadk $r1 $k3',
-                        'call $r0 2 1'
+                        'getglobal $r0 $k6',
+                        'getglobal $r1 $k3',
+                        'loadk $r2 $k4',
+                        'gettable $r1 $r1 $r2',
+                        'getglobal $r2 $k1',
+                        'loadk $r3 $k2',
+                        'gettable $r2 $r2 $r3',      
+                        'loadk $r3 $k8',
+                        'call $r2 2 2',
+                        'call $r1 2 2',
+                        'loadk $r3 $k5',
+                        'self $r1 $r1 $r3',
+                        'loadk $r3 $k9',
+                        'call $r1 3 2',
+                        'call $r0 2 2',
+                        'call $r0 1 1'
                     ]
                 }
             ]
@@ -226,6 +261,9 @@ def main():
         }
     ]
 
+    if android: 
+        pbml_patches[0]['addConstants'][7:9] = ['"pbml/init.txt"', '"pbml/main.txt"']
+
     def write(text: str):
         logs.append(text + '\n')
         if not silent: print(text)
@@ -237,6 +275,17 @@ def main():
     if shutil.which('java') is None:
         raise Exception('Java not found')
 
+    if android:
+        if not os.path.isfile(os.path.join(script_dir, APKTOOL_FILE_NAME)):
+            write('Downloading apktool...')
+            with open(os.path.join(script_dir, APKTOOL_FILE_NAME), 'wb') as file:
+                file.write(urlopen(APKTOOL_URL).read())
+        
+        if not os.path.isfile(os.path.join(script_dir, APKSIGNER_FILE_NAME)):
+            write('Downloading uber-apk-signer...')
+            with open(os.path.join(script_dir, APKSIGNER_FILE_NAME), 'wb') as file:
+                file.write(urlopen(APKSIGNER_URL).read())
+
     if not os.path.isfile(os.path.join(script_dir, CORONA_ARCHIVER_FILE_NAME)):
         write('Downloading corona-archiver...')
         with open(os.path.join(script_dir, CORONA_ARCHIVER_FILE_NAME), 'wb') as file:
@@ -246,6 +295,16 @@ def main():
         write('Downloading unluac...')
         with open(os.path.join(script_dir, UNLUAC_FILE_NAME), 'wb') as file:
             file.write(urlopen(UNLUAC_URL).read())
+
+    if android:
+        write('Debundling base.apk...')
+        run_cmd('java', '-jar', os.path.join(script_dir, APKTOOL_FILE_NAME), 'd', os.path.join(game_dir, 'base.apk'))
+        game_dir = os.path.join(game_dir, 'base')
+
+        write('Rewriting manifest...')
+        manifest = ET.parse(os.path.join(game_dir, 'AndroidManifest.xml'))
+        manifest.getroot().append(ET.fromstring('<uses-permission xmlns:android="http://schemas.android.com/apk/res/android" android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>'))
+        manifest.write(os.path.join(game_dir, 'AndroidManifest.xml'))
 
     resource_car_path = os.path.join(game_dir, resources_dir, 'resource.car')
 
@@ -293,36 +352,51 @@ def main():
     if not patch:
         write('Creating PBML files...')
 
+        
         if not os.path.isdir(os.path.join(game_dir, resources_dir, 'pbml')):
             os.mkdir(os.path.join(game_dir, resources_dir, 'pbml'))
 
-        if not os.path.isdir(os.path.join(game_dir, resources_dir, 'mods')):
-            os.mkdir(os.path.join(game_dir, resources_dir, 'mods'))
+        if not android:
+            if not os.path.isdir(os.path.join(game_dir, resources_dir, 'mods')):
+                os.mkdir(os.path.join(game_dir, resources_dir, 'mods'))
 
-        if not os.path.isdir(os.path.join(game_dir, 'pbml')):
-            os.mkdir(os.path.join(game_dir, 'pbml'))
+            if not os.path.isdir(os.path.join(game_dir, 'pbml')):
+                os.mkdir(os.path.join(game_dir, 'pbml'))
 
-        shutil.copyfile(os.path.abspath(__file__), os.path.join(game_dir, 'pbml', 'pbml.py'))
-        shutil.copyfile(os.path.join(script_dir, CORONA_ARCHIVER_FILE_NAME), os.path.join(game_dir, 'pbml', CORONA_ARCHIVER_FILE_NAME))
-        shutil.copyfile(os.path.join(script_dir, UNLUAC_FILE_NAME), os.path.join(game_dir, 'pbml', UNLUAC_FILE_NAME))
+            shutil.copyfile(os.path.abspath(__file__), os.path.join(game_dir, 'pbml', 'pbml.py'))
+            shutil.copyfile(os.path.join(script_dir, CORONA_ARCHIVER_FILE_NAME), os.path.join(game_dir, 'pbml', CORONA_ARCHIVER_FILE_NAME))
+            shutil.copyfile(os.path.join(script_dir, UNLUAC_FILE_NAME), os.path.join(game_dir, 'pbml', UNLUAC_FILE_NAME))
 
         for script in os.listdir(os.path.join(script_dir, 'scripts')):
             if script == '.' or script == '..': continue
 
             with open(os.path.join(script_dir, 'scripts', script), 'r') as script_data:
+                script = script.replace('.lua', '.txt') if android else script
+
                 with open(os.path.join(game_dir, resources_dir, 'pbml', script), 'w') as script_wrt:
                     code = script_data.read()
+                    if android: code = code.replace('.lua', '.txt')
+                    code = code.replace('.-lua', '.lua') # ugly workaround
                     code = code.replace('__PBML_GAME_DIRECTORY__', game_dir.replace('\\', '/'))
-                    code = code.replace('__PBML_RESOURCES_DIRECTORY__', os.path.join(game_dir, resources_dir).replace('\\', '/'))
-                    code = code.replace('__PBML_DATA_DIRECTORY__', os.path.join(game_dir, data_dir).replace('\\', '/'))
+                    code = code.replace('__PBML_RESOURCES_DIRECTORY__', '' if android else os.path.join(game_dir, resources_dir).replace('\\', '/'))
+                    code = code.replace('__PBML_DATA_DIRECTORY__', data_dir if android else os.path.join(game_dir, data_dir).replace('\\', '/'))
                     code = code.replace('__PBML_PYTHON_PATH__', sys.executable.replace('\\', '/'))
                     code = code.replace('__PBML_PATCHER_PATH__', os.path.abspath(__file__).replace('\\', '/'))
                     script_wrt.write(code)
+
+    if android:
+        write('Rebundling base.apk...')
+        run_cmd('java', '-jar', os.path.join(script_dir, APKTOOL_FILE_NAME), 'b', game_dir, '-o', os.path.join(os.path.dirname(game_dir), 'base.apk'))
+
+        write('Signing APKs...')
+        run_cmd('java', '-jar', os.path.join(script_dir, APKSIGNER_FILE_NAME), '--apks', os.path.dirname(game_dir), '--allowResign', '--overwrite')
 
     write('Cleaning up...')
     os.remove(os.path.join(script_dir, 'main_src.txt'))
     if not debug: os.remove(os.path.join(script_dir, 'main_dst.txt'))
     shutil.rmtree(os.path.join(script_dir, 'res'))
+    if android: shutil.rmtree(os.path.join(game_dir))
+
 
     write('')
     write('Completed')

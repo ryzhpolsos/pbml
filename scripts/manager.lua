@@ -133,6 +133,10 @@ local function showModManager()
 
     local webView = native.newWebView(display.contentCenterX, display.contentCenterY, display.actualContentWidth / 2, display.actualContentHeight / 2)
 
+    if system.getInfo("platform") == "android" then
+        webView:setNativeProperty("setAllowFileAccess", true)
+    end
+
     webView:addEventListener('urlRequest', function(event)
         if not event.type then return end
 
@@ -149,16 +153,24 @@ local function showModManager()
                     file:write('')
                     file:close()
 
-                    os.execute('cmd.exe /q /c start "" "' .. pbml.gameDirectory .. '/Progressbar95.exe' .. '"')
-                    os.exit()
+                    if system.getInfo("platform") == "android" then
+                        native.showAlert('PBML', 'Mod disabled, restart the game.', { 'OK' }, function() os.exit(1) end)
+                    else
+                        os.execute('cmd.exe /q /c start "" "' .. pbml.gameDirectory .. '/Progressbar95.exe' .. '"')
+                        os.exit()
+                    end
                 end
             end)
         elseif act == 'enable' then
             native.showAlert('PBML', 'Are you sure you want to enable "' .. arg1 .. '" mod?', { 'Yes', 'No' }, function(event)
                 if event.action == 'clicked' and event.index == 1 then
                     os.remove(pbml.dataDirectory .. '/mods/' .. arg1 .. '/.disabled')
-                    os.execute('cmd.exe /q /c start "" "' .. pbml.gameDirectory .. '/Progressbar95.exe' .. '"')
-                    os.exit()
+                    if system.getInfo("platform") == "android" then
+                        native.showAlert('PBML', 'Mod enabled, restart the game.', { 'OK' }, function() os.exit(1) end)
+                    else
+                        os.execute('cmd.exe /q /c start "" "' .. pbml.gameDirectory .. '/Progressbar95.exe' .. '"')
+                        os.exit()
+                    end
                 end
             end)
         elseif act == 'restart' then
@@ -174,13 +186,24 @@ local function showModManager()
 
             local modName = string.match(arg1, '.*[\\/](.*)%.zip$')
 
-            os.execute('powershell.exe -exec bypass -c "Expand-Archive \'' .. arg1 .. '\' \'' .. pbml.dataDirectory .. '/mods/' .. modName .. '\' -Force ; Start-Process \'' .. pbml.gameDirectory .. '/Progressbar95.exe' .. '\'"')
-            os.exit()
+
+            if system.getInfo("platform") == "android" then
+                os.execute('unzip "' .. arg1 .. '" -d "' .. pbml.dataDirectory .. '/mods/' .. modName .. '"')
+                native.showAlert('PBML', 'Mod installed, restart the game.', { 'OK' }, function() os.exit(1) end)
+            else
+                os.execute('powershell.exe -exec bypass -c "Expand-Archive \'' .. arg1 .. '\' \'' .. pbml.dataDirectory .. '/mods/' .. modName .. '\' -Force ; Start-Process \'' .. pbml.gameDirectory .. '/Progressbar95.exe' .. '\'"')
+                os.exit()
+            end
         elseif act == 'remove' then
             native.showAlert('PBML', 'Are you sure you want to remove "' .. arg1 .. '" mod?', { 'Yes', 'No' }, function(event)
                 if event.action == 'clicked' and event.index == 1 then
-                    os.execute('cmd.exe /q /c rmdir /s /q "' .. pbml.dataDirectory .. '/mods/' .. arg1 .. '" & start "" "' .. pbml.gameDirectory .. '/Progressbar95.exe' .. '"')
-                    os.exit()
+                    if system.getInfo("platform") == "android" then
+                        os.execute('rm -rf "' .. pbml.dataDirectory .. '/mods/' .. arg1 .. '"')
+                        native.showAlert('PBML', 'Mod removed, restart the game.', { 'OK' }, function() os.exit(1) end)
+                    else
+                        os.execute('cmd.exe /q /c rmdir /s /q "' .. pbml.dataDirectory .. '/mods/' .. arg1 .. '" & start "" "' .. pbml.gameDirectory .. '/Progressbar95.exe' .. '"')
+                        os.exit()
+                    end
                 end
             end)
         end

@@ -43,4 +43,12 @@ function _M.readFile(filePath)
     return data
 end
 
+function _M.doFile(filePath)
+    local file = io.open(filePath, 'r')
+    if file == nil then return false end
+    local data = file:read('*all')
+    file:close()
+    return loadstring(data)()
+end
+
 return _M

@@ -1,4 +1,4 @@
-local util = dofile(pbml.resourcesDirectory .. '/pbml/util.lua')
+local util = inject('pbml/util.lua')
 local _realRequire = require
 local modName = '__MOD_NAME__'
 
@@ -12,12 +12,12 @@ function mod:getPath(path)
 end
 
 local function require(modname)
-    if util.isFileExists(pbml.dataDirectory .. '/mods/' .. modName .. '/' .. modname .. '.lua') then
-        return dofile(pbml.dataDirectory .. '/mods/' .. modName .. '/' .. modname .. '.lua')
+    if util.isFileExists(pbml.dataDirectory .. '/mods/' .. modName .. '/' .. modname .. '.-lua') then
+        return util.doFile(pbml.dataDirectory .. '/mods/' .. modName .. '/' .. modname .. '.-lua')
     end
 
-    if util.isFileExists(pbml.dataDirectory .. '/pbml/lib/' .. modname .. '.lua') then
-        return dofile(pbml.dataDirectory .. '/pbml/lib/' .. modname .. '.lua')
+    if util.isFileExists(pbml.dataDirectory .. '/pbml/lib/' .. modname .. '.-lua') then
+        return util.doFile(pbml.dataDirectory .. '/pbml/lib/' .. modname .. '.-lua')
     end
 
     return _realRequire(modname)
